@@ -1,5 +1,5 @@
 from prepare_dataset import Data
-from model import TransformerBlackbox
+from model import LanguageModel
 import torch
 import torch.optim as optim
 
@@ -24,7 +24,7 @@ def evaluate(model,device):
     x, y = x.to(device), y.to(device)
 
     with torch.no_grad():
-        loss,_ = model(x,y)
+        loss, _ = model(x, y)
     print("Validation Loss = ",loss.item())
 
 
@@ -36,7 +36,13 @@ if __name__ == "__main__":
     encode = data.encode
     decode = data.decode
     block_size = data.block_size
-    model = TransformerBlackbox(vocab_size, 512, 8, 8, block_size)
+    model = LanguageModel(
+        vocab_size=vocab_size, 
+        d_model=512, 
+        max_seq_length=block_size, 
+        n_heads=8, 
+        n_layers=8
+    )
     model = model.to(device)
 
     optimizer = optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)

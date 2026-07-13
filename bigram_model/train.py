@@ -23,13 +23,14 @@ def evaluate(model,device):
     x,y = data.get_batch('eval')
     x, y = x.to(device), y.to(device)
 
-    loss,_ = model(x,y)
+    with torch.no_grad():
+        loss,_ = model(x,y)
     print("Validation Loss = ",loss.item())
 
 
 if __name__ == "__main__":
     data = Data("../tinyshakesphere.txt", 128)
-    device = "cuda" if torch.cuda.is_available else 'cpu'
+    device = "cuda" if torch.cuda.is_available() else 'cpu'
 
     vocab_size = data.vocab_size
     encode = data.encode
@@ -42,7 +43,8 @@ if __name__ == "__main__":
     evaluate(model,device)
     
     start_context = torch.zeros((1, 1), dtype=torch.long).to(device)
-    gen = model.generate(start_context, 100)
+    with torch.no_grad():
+        gen = model.generate(start_context, 100)
     print(''.join([decode[int(i)] for i in gen[0]]))
 
 
